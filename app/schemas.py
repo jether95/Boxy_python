@@ -6,3 +6,10 @@ class Category(BaseModel):
 
     class Config:
         orm_mode = True
+class Client(BaseModel):
+    Id: int
+    name: str
+    lastName: str
+    document: str
+    class Config:
+        orm_mode = True
