@@ -13,3 +13,11 @@ class Client(BaseModel):
     document: str
     class Config:
         orm_mode = True
+
+class User (BaseModel):
+    id: int
+    user: str
+    password: str
+
+    class Config:
+        orm_mode = True
