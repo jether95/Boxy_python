@@ -1,4 +1,4 @@
-from .Database import Base
+from app.Database import Base
 from sqlalchemy import Column, Integer, String
 class User(Base):
     __tablename__ = 'User'

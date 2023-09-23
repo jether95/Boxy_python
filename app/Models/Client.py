@@ -1,4 +1,4 @@
-from .Database import Base
+from app.Database import Base
 from sqlalchemy import Column, String, Integer
 class Client(Base):
     __tablename__ = 'Client'

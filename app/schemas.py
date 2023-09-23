@@ -1,11 +1,21 @@
+from typing import Optional
 from pydantic import BaseModel
 
 class Category(BaseModel):
-    id: int
+    id:  Optional[int]
     nombre: str
 
     class Config:
         orm_mode = True
+class CategoryUpdate(BaseModel):
+    nombre: str
+
+    class Config:
+        orm_mode = True
+
+class Respuesta(BaseModel):
+    mensaje:str
+
 class Client(BaseModel):
     Id: int
     name: str

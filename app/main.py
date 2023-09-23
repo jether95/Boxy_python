@@ -3,7 +3,8 @@ from typing import List
 from fastapi import FastAPI, Depends
 from starlette.responses import RedirectResponse
 from sqlalchemy.orm import Session
-from . import schemas, Client, User, Category
+from . import schemas
+from .Models import Category, User, Client
 #from Category import Category as categoryModel
 from .Database import SessionLocal, engine
 
@@ -64,3 +65,18 @@ def createCategory (entrada: schemas.Category, db: Session=Depends(getDb)):
     db.refresh(category)
     return category
 
+@app.put('/category/{category_id}',response_model=schemas.Category)
+def UpdateCategory (category_id: int, entrada: schemas.CategoryUpdate, db: Session=Depends(getDb)):
+    category = db.query(Category.Category).filter_by(id = category_id).first()
+    category.nombre = entrada.nombre
+    db.commit()
+    db.refresh(category)
+    return category
+
+@app.delete('/category/{category_id}',response_model=schemas.Respuesta)
+def DeleteCategory (category_id: int, db: Session=Depends(getDb)):
+    category = db.query(Category.Category).filter_by(id = category_id).first()
+    db.delete(category)
+    db.commit()
+    respuesta = schemas.Respuesta(mensaje="Eliminado exitosamente")
+    return respuesta
