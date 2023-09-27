@@ -1,12 +1,15 @@
 from typing import List
 
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request, HTTPException
 from starlette.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from . import schemas
 from .Models import Category, User, Client
 #from Category import Category as categoryModel
 from .Database import SessionLocal, engine
+from .jwt_manager import create_token, validate_token
+from fastapi.responses import JSONResponse
+from fastapi.security import HTTPBearer
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -36,12 +39,21 @@ def getDb():
     finally:
         db.close()
 
+class JWTBearer(HTTPBearer):
+    async def __call__(self, request: Request):
+        auth = await super().__call__(request)
+        data = validate_token(auth.credentials)
+        if data['user'] != "juaco":
+            raise HTTPException(status_code=403, detail="Credenciales incorrectas")
+
+
+
 #Metodos GET
 @app.get("/")
 async def main():
     return RedirectResponse(url="/docs")
 
-@app.get('/category', response_model=List[schemas.Category])
+@app.get('/category', response_model=List[schemas.Category], dependencies=[Depends(JWTBearer())])
 def showCategory(db:Session=Depends(getDb)):
     categories = db.query(Category.Category).all()
     return categories
@@ -80,3 +92,9 @@ def DeleteCategory (category_id: int, db: Session=Depends(getDb)):
     db.commit()
     respuesta = schemas.Respuesta(mensaje="Eliminado exitosamente")
     return respuesta
+
+@app.post('/login', tags=['auth'])
+def login(user: schemas.User):
+    if user.id == 1 and user.user == "juaco" and user.password == "123":
+        token: str = create_token(user.model_dump())
+        return JSONResponse(status_code=200, content=token)
