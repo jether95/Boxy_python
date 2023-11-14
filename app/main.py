@@ -58,10 +58,37 @@ def showCategory(db:Session=Depends(getDb)):
     categories = db.query(Category.Category).all()
     return categories
 
+#Cliente
 @app.get('/client', response_model=List[schemas.Client])
 def showClient(db:Session=Depends(getDb)):
     clients = db.query(Client.Client).all()
     return clients
+
+@app.post('/client/', response_model=schemas.Client)
+def createClient(schema: schemas.Client, dataBase: Session=Depends(getDb)):
+    cliente = Client.Client(name=schema.name, lastName=schema.lastName, document=schema.document)
+    dataBase.add(cliente)
+    dataBase.commit()
+    dataBase.refresh(cliente)
+    return cliente
+
+@app.put('/cliente/{client_id}', response_model=schemas.Client)
+def updateClient(client_id: int, schema: schemas.Client, dataBase: Session = Depends((getDb))):
+    client = dataBase.query(Client.Client).filter_by(Id=client_id).first()
+    client.name = schema.name
+    client.lastName = schema.lastName
+    client.document = schema.document
+    dataBase.commit()
+    dataBase.refresh(client)
+    return client
+
+@app.delete('/client/{client_id}', response_model=schemas.Client)
+def deleteClient(client_id: int, schema: schemas.Client, dataBase: Session=Depends(getDb)):
+    client = dataBase.query(Client.Client).filter_by(Id=client_id).first()
+    dataBase.delete(client)
+    dataBase.commit()
+    respuesta = schemas.Respuesta(mensaje=f'Cliente {client_id} eliminado correctamente')
+    return client
 
 @app.get('/user', response_model=List[schemas.User])
 async def showUser(db: Session = Depends(getDb)):

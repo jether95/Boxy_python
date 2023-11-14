@@ -17,7 +17,7 @@ class Respuesta(BaseModel):
     mensaje:str
 
 class Client(BaseModel):
-    Id: int
+    #Id: Optional[int]
     name: str
     lastName: str
     document: str
